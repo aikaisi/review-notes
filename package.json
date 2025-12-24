@@ -1,19 +1,19 @@
 {
   "name": "review-notes",
   "displayName": "Review Notes",
-  "description": "Add local code review notes to your files without modifying source code. Mimics MS Word Comments or Bitbucket Code Review experience.",
-  "version": "0.1.0",
-  "publisher": "Abbas Al-Kaisi",
+  "description": "Add local code review notes to your files without modifying source code. Features: priority levels, categories, tree view, export to Markdown/HTML.",
+  "version": "0.2.0",
+  "publisher": "aikaisi",
   "author": "Abbas Al-Kaisi",
   "license": "MIT",
   "icon": "images/icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/review-notes"
+    "url": "https://github.com/aikaisi/review-notes"
   },
-  "homepage": "https://github.com/your-username/review-notes#readme",
+  "homepage": "https://github.com/aikaisi/review-notes#readme",
   "bugs": {
-    "url": "https://github.com/your-username/review-notes/issues"
+    "url": "https://github.com/aikaisi/review-notes/issues"
   },
   "engines": {
     "vscode": "^1.85.0"
@@ -28,7 +28,8 @@
     "annotations",
     "review",
     "todo",
-    "documentation"
+    "documentation",
+    "productivity"
   ],
   "galleryBanner": {
     "color": "#1e1e2e",
@@ -42,11 +43,13 @@
     "commands": [
       {
         "command": "reviewNotes.addNote",
-        "title": "Add Review Note"
+        "title": "Add Review Note",
+        "icon": "$(add)"
       },
       {
         "command": "reviewNotes.createNote",
-        "title": "Save Note"
+        "title": "Save Note",
+        "icon": "$(check)"
       },
       {
         "command": "reviewNotes.saveNote",
@@ -57,12 +60,113 @@
         "title": "Cancel"
       },
       {
+        "command": "reviewNotes.discardNote",
+        "title": "Discard",
+        "icon": "$(close)"
+      },
+      {
         "command": "reviewNotes.deleteNote",
-        "title": "Delete Note"
+        "title": "Delete Note",
+        "icon": "$(trash)"
       },
       {
         "command": "reviewNotes.editNote",
-        "title": "Edit"
+        "title": "Edit",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "reviewNotes.editProperties",
+        "title": "Edit Category & Priority",
+        "icon": "$(settings-gear)"
+      },
+      {
+        "command": "reviewNotes.setPriorityHigh",
+        "title": "Set Priority: 🔴 High"
+      },
+      {
+        "command": "reviewNotes.setPriorityMedium",
+        "title": "Set Priority: 🟡 Medium"
+      },
+      {
+        "command": "reviewNotes.setPriorityLow",
+        "title": "Set Priority: 🟢 Low"
+      },
+      {
+        "command": "reviewNotes.setCategoryTodo",
+        "title": "Set Category: 📋 TODO"
+      },
+      {
+        "command": "reviewNotes.setCategoryBug",
+        "title": "Set Category: 🐛 BUG"
+      },
+      {
+        "command": "reviewNotes.setCategoryQuestion",
+        "title": "Set Category: ❓ QUESTION"
+      },
+      {
+        "command": "reviewNotes.setCategoryIdea",
+        "title": "Set Category: 💡 IDEA"
+      },
+      {
+        "command": "reviewNotes.setCategoryNote",
+        "title": "Set Category: 📝 NOTE"
+      },
+      {
+        "command": "reviewNotes.refreshTree",
+        "title": "Refresh Notes",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "reviewNotes.exportMarkdown",
+        "title": "Export Notes to Markdown",
+        "icon": "$(markdown)"
+      },
+      {
+        "command": "reviewNotes.exportHtml",
+        "title": "Export Notes to HTML",
+        "icon": "$(file-code)"
+      },
+      {
+        "command": "reviewNotes.goToNote",
+        "title": "Go to Note"
+      },
+      {
+        "command": "reviewNotes.deleteNoteFromTree",
+        "title": "Delete Note",
+        "icon": "$(trash)"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "reviewNotes.addNote",
+        "key": "ctrl+shift+n",
+        "mac": "cmd+shift+n",
+        "when": "editorTextFocus"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "reviewNotes",
+          "title": "Review Notes",
+          "icon": "$(comment-discussion)"
+        }
+      ]
+    },
+    "views": {
+      "reviewNotes": [
+        {
+          "id": "reviewNotesExplorer",
+          "name": "Notes Explorer",
+          "icon": "$(comment-discussion)",
+          "contextualTitle": "Review Notes"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "reviewNotesExplorer",
+        "contents": "No review notes yet.\n\nAdd a note by right-clicking on a line in the editor or using the keyboard shortcut:\n[Add Review Note](command:reviewNotes.addNote)\n\nOr press Ctrl+Shift+N (Cmd+Shift+N on Mac)"
       }
     ],
     "menus": {
@@ -73,24 +177,98 @@
           "when": "editorTextFocus"
         }
       ],
+      "view/title": [
+        {
+          "command": "reviewNotes.refreshTree",
+          "when": "view == reviewNotesExplorer",
+          "group": "navigation@1"
+        },
+        {
+          "command": "reviewNotes.exportMarkdown",
+          "when": "view == reviewNotesExplorer",
+          "group": "navigation@2"
+        },
+        {
+          "command": "reviewNotes.exportHtml",
+          "when": "view == reviewNotesExplorer",
+          "group": "navigation@3"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "reviewNotes.deleteNoteFromTree",
+          "when": "view == reviewNotesExplorer && viewItem == note",
+          "group": "inline"
+        }
+      ],
       "comments/commentThread/title": [
         {
           "command": "reviewNotes.deleteNote",
           "group": "inline",
-          "when": "commentController == reviewNotes"
+          "when": "commentController == reviewNotes && !commentThreadIsEmpty"
         }
       ],
       "comments/commentThread/context": [
         {
           "command": "reviewNotes.createNote",
-          "group": "inline",
+          "group": "inline@1",
           "when": "commentController == reviewNotes && commentThreadIsEmpty"
+        },
+        {
+          "command": "reviewNotes.discardNote",
+          "group": "inline@2",
+          "when": "commentController == reviewNotes && commentThreadIsEmpty"
+        },
+        {
+          "command": "reviewNotes.setPriorityHigh",
+          "group": "1_priority@1",
+          "when": "commentController == reviewNotes && !commentThreadIsEmpty"
+        },
+        {
+          "command": "reviewNotes.setPriorityMedium",
+          "group": "1_priority@2",
+          "when": "commentController == reviewNotes && !commentThreadIsEmpty"
+        },
+        {
+          "command": "reviewNotes.setPriorityLow",
+          "group": "1_priority@3",
+          "when": "commentController == reviewNotes && !commentThreadIsEmpty"
+        },
+        {
+          "command": "reviewNotes.setCategoryTodo",
+          "group": "2_category@1",
+          "when": "commentController == reviewNotes && !commentThreadIsEmpty"
+        },
+        {
+          "command": "reviewNotes.setCategoryBug",
+          "group": "2_category@2",
+          "when": "commentController == reviewNotes && !commentThreadIsEmpty"
+        },
+        {
+          "command": "reviewNotes.setCategoryQuestion",
+          "group": "2_category@3",
+          "when": "commentController == reviewNotes && !commentThreadIsEmpty"
+        },
+        {
+          "command": "reviewNotes.setCategoryIdea",
+          "group": "2_category@4",
+          "when": "commentController == reviewNotes && !commentThreadIsEmpty"
+        },
+        {
+          "command": "reviewNotes.setCategoryNote",
+          "group": "2_category@5",
+          "when": "commentController == reviewNotes && !commentThreadIsEmpty"
         }
       ],
       "comments/comment/title": [
         {
+          "command": "reviewNotes.editProperties",
+          "group": "inline@1",
+          "when": "commentController == reviewNotes && comment == reviewNote"
+        },
+        {
           "command": "reviewNotes.editNote",
-          "group": "inline",
+          "group": "inline@2",
           "when": "commentController == reviewNotes && comment == reviewNote"
         }
       ],
@@ -106,23 +284,55 @@
           "when": "commentController == reviewNotes && comment == reviewNote"
         }
       ]
-    }
+    },
+    "colors": [
+      {
+        "id": "reviewNotes.priorityHigh",
+        "description": "Color for high priority notes",
+        "defaults": {
+          "dark": "#f44336",
+          "light": "#d32f2f"
+        }
+      },
+      {
+        "id": "reviewNotes.priorityMedium",
+        "description": "Color for medium priority notes",
+        "defaults": {
+          "dark": "#ff9800",
+          "light": "#f57c00"
+        }
+      },
+      {
+        "id": "reviewNotes.priorityLow",
+        "description": "Color for low priority notes",
+        "defaults": {
+          "dark": "#4caf50",
+          "light": "#388e3c"
+        }
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile",
-    "lint": "eslint src --ext ts",
-    "package": "vsce package"
+    "lint": "eslint src",
+    "package": "vsce package",
+    "publish:vscode": "vsce publish",
+    "publish:openvsx": "ovsx publish",
+    "publish:all": "npm run publish:vscode && npm run publish:openvsx"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.2",
     "@types/node": "^20.x",
     "@types/vscode": "^1.85.0",
     "@typescript-eslint/eslint-plugin": "^6.x",
     "@typescript-eslint/parser": "^6.x",
-    "eslint": "^8.x",
-    "typescript": "^5.3.0",
-    "@vscode/vsce": "^3.0.0"
+    "@vscode/vsce": "^3.0.0",
+    "eslint": "^8.57.1",
+    "globals": "^16.5.0",
+    "ovsx": "^0.10.0",
+    "typescript": "^5.3.0"
   }
 }

@@ -1,11 +1,14 @@
 import * as vscode from 'vscode';
 import { NoteStorage } from './noteStorage';
 import { ReviewNotesProvider } from './reviewNotesProvider';
+import { NotesTreeProvider, registerTreeViewCommands } from './notesTreeProvider';
+import { registerExportCommands } from './exportProvider';
 import { WorkspaceManager, getCurrentWorkspaceRoot } from './workspaceManager';
 
 let storage: NoteStorage | undefined;
 let provider: ReviewNotesProvider | undefined;
 let workspaceManager: WorkspaceManager | undefined;
+let treeProvider: NotesTreeProvider | undefined;
 
 /**
  * Extension activation
@@ -32,21 +35,26 @@ export async function activate(context: vscode.ExtensionContext) {
     provider = new ReviewNotesProvider(storage, context);
     console.log('Review Notes: Provider initialized');
 
+    // Initialize tree view
+    treeProvider = new NotesTreeProvider(storage);
+    const treeView = vscode.window.createTreeView('reviewNotesExplorer', {
+        treeDataProvider: treeProvider,
+        showCollapseAll: true
+    });
+    context.subscriptions.push(treeView);
+    console.log('Review Notes: Tree view initialized');
+
     // Initialize workspace manager
     workspaceManager = new WorkspaceManager();
 
-    // Register add note command (context menu)
-    const addNoteCommand = vscode.commands.registerCommand('reviewNotes.addNote', async () => {
-        const editor = vscode.window.activeTextEditor;
-        if (!editor || !provider) {
-            return;
-        }
+    // Register main commands
+    registerMainCommands(context);
 
-        const line = editor.selection.active.line;
-        await provider.addNoteAtLine(editor.document.uri, line);
-    });
+    // Register tree view commands
+    registerTreeViewCommands(context, storage, provider);
 
-    context.subscriptions.push(addNoteCommand);
+    // Register export commands
+    registerExportCommands(context, storage);
 
     // Set up event listeners
     setupEventListeners(context);
@@ -57,6 +65,31 @@ export async function activate(context: vscode.ExtensionContext) {
     }
 
     console.log('Review Notes: Extension activated successfully');
+}
+
+/**
+ * Register main extension commands
+ */
+function registerMainCommands(context: vscode.ExtensionContext) {
+    // Add note command (context menu and keyboard shortcut)
+    const addNoteCommand = vscode.commands.registerCommand('reviewNotes.addNote', async () => {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor || !provider) {
+            return;
+        }
+
+        const line = editor.selection.active.line;
+        await provider.addNoteAtLine(editor.document.uri, line);
+    });
+
+    // Refresh tree view command
+    const refreshCommand = vscode.commands.registerCommand('reviewNotes.refreshTree', () => {
+        if (treeProvider) {
+            treeProvider.refresh();
+        }
+    });
+
+    context.subscriptions.push(addNoteCommand, refreshCommand);
 }
 
 /**
@@ -80,13 +113,18 @@ function setupEventListeners(context: vscode.ExtensionContext) {
         if (newRoot && storage && provider) {
             console.log(`Review Notes: Workspace changed to ${newRoot}`);
 
-            // Dispose old storage and provider
+            // Dispose old storage
             storage.dispose();
             provider.clearAllThreads();
 
             // Create new storage for new workspace
             storage = new NoteStorage(newRoot);
             await storage.load();
+
+            // Update tree provider
+            if (treeProvider) {
+                treeProvider = new NotesTreeProvider(storage);
+            }
 
             // Render notes for active editor
             if (vscode.window.activeTextEditor) {
@@ -101,6 +139,10 @@ function setupEventListeners(context: vscode.ExtensionContext) {
         // Reload notes for active editor when .notes.json changes externally
         if (vscode.window.activeTextEditor && provider) {
             provider.renderNotesForFile(vscode.window.activeTextEditor.document.uri);
+        }
+        // Refresh tree view
+        if (treeProvider) {
+            treeProvider.refresh();
         }
     });
 

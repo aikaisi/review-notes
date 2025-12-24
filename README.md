@@ -1,129 +1,85 @@
 # Review Notes
 
-> Add local code review notes to your files without modifying source code. Mimics the MS Word Comments or Bitbucket Code Review experience directly in VS Code.
+[![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/aikaisi.review-notes?label=VS%20Code%20Marketplace)](https://marketplace.visualstudio.com/items?itemName=aikaisi.review-notes)
+[![Open VSX](https://img.shields.io/open-vsx/v/aikaisi/review-notes?label=Open%20VSX)](https://open-vsx.org/extension/aikaisi/review-notes)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## Features
+> Add local code review notes to your files without modifying source code — like commenting in Word or Bitbucket, but entirely local.
 
-- **Native Comment Threads**: Uses VS Code's built-in Comments API for an authentic PR-style review experience
-- **Local Storage**: All notes are saved to `.notes.json` in your workspace root
-- **No Source Code Changes**: Notes are stored separately and never modify your actual code files
-- **Multi-Root Workspace Support**: Each workspace folder has its own `.notes.json` file
-- **Real-time Sync**: File watching detects external changes to `.notes.json`
-- **Cross-Platform**: Works on Windows, macOS, and Linux
+## ✨ Overview
 
-## Usage
+**Review Notes** allows you to annotate your code with rich comments, similar to a Pull Request review, but stored locally in a separate JSON file (`.notes.json`). This means you can add TODOs, questions, bugs, and ideas without cluttering your actual source code.
 
-### Adding a Note
+![Review Notes View](images/review_notes_view.png)
 
-1. Right-click on any line in your code
-2. Select **"Add Review Note"** from the context menu
-3. Enter your note text in the input box
-4. The note appears as a comment thread in the gutter
+## � Usage
 
-### Editing a Note
+### 1. Adding Notes
 
-- Click on the comment thread to view the note
-- Use the reply functionality to update the note text
+You can add a note to any line of code in three ways:
+1. **Right-click** on a line and select **"Add Review Note"**.
+2. Click the **+** icon in the editor gutter (margin).
+3. Use the keyboard shortcut: `Ctrl+Shift+N` (Mac: `Cmd+Shift+N`).
 
-### Deleting a Note
+![Add Note Context Menu](images/review_notes_add_note_context_menu.png)
+![Add Note Gutter](images/review_notes_add_note.png)
 
-- Click the delete icon on the comment thread
-- Or use the "Delete Review Note" command from the thread context menu
+Once triggered, a comment widget will appear. Type your note (Markdown is supported!) and click **Add Review Note**.
 
-## Data Storage
+![Create Note](images/review_notes_create_note.png)
+![Markdown Support](images/review_notes_support_markdown.png)
 
-All notes are stored in a `.notes.json` file at the root of your workspace:
+### 2. Editing Notes
 
-```json
-{
-  "./src/example.ts": [
-    {
-      "id": "1234567890-abc123",
-      "line": 42,
-      "text": "This function needs optimization",
-      "timestamp": 1703376000000,
-      "author": "username"
-    }
-  ]
-}
-```
+Need to change the text? Just click the **pencil icon** on any existing note to edit its content.
 
-### Sharing Notes
+![Edit Note](images/%20review_notes_edit.png)
 
-- **Private notes**: Add `.notes.json` to your `.gitignore`
-- **Team notes**: Commit `.notes.json` to share notes with your team
+### 3. Changing Category and Priority
 
-## Requirements
+Organize your notes by assigning categories and priority levels.
+- **Categories**: 📋 TODO, 🐛 BUG, ❓ QUESTION, 💡 IDEA, 📝 NOTE
+- **Priorities**: 🔴 High, 🟡 Medium, 🟢 Low
 
-- VS Code 1.85.0 or higher
+You can change these properties easily via the edit menu on the note.
 
-## Installation
+![Edit Category](images/review_notes_edit_category.png)
+![Edit Priority](images/review_notes_edit_priority_level.png)
 
-### From VSIX
+### 4. Viewing All Notes (Tree View)
 
-1. Download the `.vsix` file
-2. Open VS Code
-3. Go to Extensions view (Cmd+Shift+X / Ctrl+Shift+X)
-4. Click the "..." menu → "Install from VSIX..."
-5. Select the downloaded file
+See a comprehensive overview of all your notes across the entire project in the **Review Notes Explorer** sidebar. Click on any note to jump directly to that line in the code.
 
-### From Source
+![Tree View](images/review_notes_tree_view.png)
 
-```bash
-# Clone or download the extension
-cd review-notes
+### 5. Deleting Notes
 
-# Install dependencies
-npm install
+You can delete notes either directly from the **comment thread in the editor** or by clicking the trash icon in the **sidebar explorer**.
 
-# Compile TypeScript
-npm run compile
+### 💾 How it Works
 
-# Package the extension (optional)
-npm install -g @vscode/vsce
-vsce package
-```
+Your notes are **NOT** written into your source code files. Instead, they are safely stored in a separate `.notes.json` file in your workspace root.
 
-## Development
+![Notes JSON](images/notes_json.png)
 
-### Running in Development Mode
+This keeps your codebase clean while preserving all your review data.
 
-1. Open the extension folder in VS Code
-2. Press `F5` to launch the Extension Development Host
-3. Open a workspace in the development host
-4. Test the extension features
+**Sharing:**
+- **Private:** Add `.notes.json` to your `.gitignore` to keep notes to yourself.
+- **Team:** Commit `.notes.json` to your repository to share notes with your team.
 
-### Building
+---
 
-```bash
-# Compile TypeScript
-npm run compile
+## ⌨️ Shortcuts
 
-# Watch mode (auto-compile on changes)
-npm run watch
+| Shortcut | Command |
+|----------|---------|
+| `Ctrl+Shift+N` | Add Review Note at cursor |
 
-# Package for distribution
-vsce package
-```
+## 🤝 Contributing
 
-## FAQ
+Contributions welcome! Submit issues or pull requests on [GitHub](https://github.com/aikaisi/review-notes).
 
-**Q: Can I use this with Git?**  
-A: Yes! You can either commit `.notes.json` to share notes with your team, or add it to `.gitignore` to keep notes private.
+## 📄 License
 
-**Q: What happens if I move or rename a file?**  
-A: Notes are stored by file path, so you'll need to manually update the path in `.notes.json` if you move/rename files.
-
-**Q: Can I export notes to a report?**  
-A: Currently, notes are stored in JSON format. You can manually parse `.notes.json` to create custom reports.
-
-**Q: Does this work with multi-root workspaces?**  
-A: Yes! Each workspace folder gets its own `.notes.json` file.
-
-## License
-
-MIT
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit issues or pull requests.
+[MIT](LICENSE) © Abbas Al-Kaisi

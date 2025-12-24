@@ -1,0 +1,128 @@
+{
+  "name": "review-notes",
+  "displayName": "Review Notes",
+  "description": "Add local code review notes to your files without modifying source code. Mimics MS Word Comments or Bitbucket Code Review experience.",
+  "version": "0.1.0",
+  "publisher": "Abbas Al-Kaisi",
+  "author": "Abbas Al-Kaisi",
+  "license": "MIT",
+  "icon": "images/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/review-notes"
+  },
+  "homepage": "https://github.com/your-username/review-notes#readme",
+  "bugs": {
+    "url": "https://github.com/your-username/review-notes/issues"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "code review",
+    "comments",
+    "notes",
+    "annotations",
+    "review",
+    "todo",
+    "documentation"
+  ],
+  "galleryBanner": {
+    "color": "#1e1e2e",
+    "theme": "dark"
+  },
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "reviewNotes.addNote",
+        "title": "Add Review Note"
+      },
+      {
+        "command": "reviewNotes.createNote",
+        "title": "Save Note"
+      },
+      {
+        "command": "reviewNotes.saveNote",
+        "title": "Save"
+      },
+      {
+        "command": "reviewNotes.cancelNote",
+        "title": "Cancel"
+      },
+      {
+        "command": "reviewNotes.deleteNote",
+        "title": "Delete Note"
+      },
+      {
+        "command": "reviewNotes.editNote",
+        "title": "Edit"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "reviewNotes.addNote",
+          "group": "navigation@1",
+          "when": "editorTextFocus"
+        }
+      ],
+      "comments/commentThread/title": [
+        {
+          "command": "reviewNotes.deleteNote",
+          "group": "inline",
+          "when": "commentController == reviewNotes"
+        }
+      ],
+      "comments/commentThread/context": [
+        {
+          "command": "reviewNotes.createNote",
+          "group": "inline",
+          "when": "commentController == reviewNotes && commentThreadIsEmpty"
+        }
+      ],
+      "comments/comment/title": [
+        {
+          "command": "reviewNotes.editNote",
+          "group": "inline",
+          "when": "commentController == reviewNotes && comment == reviewNote"
+        }
+      ],
+      "comments/comment/context": [
+        {
+          "command": "reviewNotes.saveNote",
+          "group": "inline@1",
+          "when": "commentController == reviewNotes && comment == reviewNote"
+        },
+        {
+          "command": "reviewNotes.cancelNote",
+          "group": "inline@2",
+          "when": "commentController == reviewNotes && comment == reviewNote"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile",
+    "lint": "eslint src --ext ts",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^20.x",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^6.x",
+    "@typescript-eslint/parser": "^6.x",
+    "eslint": "^8.x",
+    "typescript": "^5.3.0",
+    "@vscode/vsce": "^3.0.0"
+  }
+}
